@@ -1,0 +1,40 @@
+#!/usr/bin/env python
+
+import os,sys,glob,string
+import simplejson
+import ConfigParser
+from pymongo import Connection
+
+cp = ConfigParser.ConfigParser()
+cp.read("/etc/cobbler/mongodb.conf")
+
+host = cp.get("connection","host")
+port = int(cp.get("connection","port"))
+
+mongodb = Connection(host, port)['cobbler']
+
+for collection_name in ["distro","profile","system","repo","network","image","mgmtclass","package","file"]:
+   # get the plural for the config directory
+   if collection_name[-1] == "s": 
+      dir_name = os.path.join("/var/lib/cobbler/config",collection_name + "es.d")
+   else:
+      dir_name = os.path.join("/var/lib/cobbler/config",collection_name + "s.d")
+
+   #print "dir name = %s" % dir_name
+   files = glob.glob(dir_name + "/*")
+   for file in files:
+      if not file.find(".json"):
+         print "Skipping non-json file %s" % file
+         continue
+      else:
+         f = open(file,'r')
+         data = simplejson.loads(f.read())
+         f.close()
+
+         collection = mongodb[collection_name]
+         obj = collection.find_one({'name':data['name']})
+         if obj:
+           print "Object named %s of type %s already exists." # Use --force to allow overwriting" % (data['name'],collection_name)
+         else:
+           print "Adding %s to %s collection" % (data['name'],collection_name)
+           collection.insert(data)
