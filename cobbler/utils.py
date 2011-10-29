@@ -1364,6 +1364,10 @@ def set_repo_breed(self,breed):
    nicer = ", ".join(valid_breeds)
    raise CX(_("invalid value for --breed (%s), must be one of %s, different breeds have different levels of support") % (breed, nicer))
 
+def set_repo_remote_name(self,name):
+   self.remote_name = name
+   return True
+
 def set_repos(self,repos,bypass_check=False):
    # WARNING: hack
    # repos = fix_mod_python_select_submission(repos)

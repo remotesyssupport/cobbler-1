@@ -66,7 +66,7 @@ class RepoSync:
         if logger is None:
            self.logger = clogger.Logger()
 
-        self.logger.info("hello, reposync")
+        #self.logger.info("hello, reposync")
 
 
     # ===================================================================
@@ -76,7 +76,7 @@ class RepoSync:
         Syncs the current repo configuration file with the filesystem.
         """
             
-        self.logger.info("run, reposync, run!")
+        #self.logger.info("run, reposync, run!")
         
         try:
             self.tries = int(self.tries)
@@ -274,9 +274,9 @@ class RepoSync:
             self.logger.warning("warning: --rpm-list is not supported for RHN content")
         rest = repo.mirror[6:] # everything after rhn://
         cmd = "/usr/bin/reposync %s -r %s --download_path=%s" % (self.rflags, rest, self.settings.webdir+"/repo_mirror")
-        if repo.name != rest:
+        if repo.name != rest and repo.remote_name != rest:
             args = { "name" : repo.name, "rest" : rest }
-            utils.die(self.logger,"ERROR: repository %(name)s needs to be renamed %(rest)s as the name of the cobbler repository must match the name of the RHN channel" % args)
+            utils.die(self.logger,"ERROR: repository %(name)s needs to be renamed %(rest)s as the name of the cobbler repository must match the name of the RHN channel, or set the --remote-name for the repo to the RHN channel" % args)
 
         if repo.arch == "i386":
             # counter-intuitive, but we want the newish kernels too
@@ -346,6 +346,9 @@ class RepoSync:
         if repo.mirror_locally:
             temp_file = self.create_local_file(temp_path, repo, output=False)
 
+        if repo.name != repo.remote_name and repo.remote_name != '':
+            self.logger.warning("ignoring --remote-name for yum repo")
+            
         if not has_rpm_list and repo.mirror_locally:
             # if we have not requested only certain RPMs, use reposync
             cmd = "/usr/bin/reposync %s --config=%s --repoid=%s --download_path=%s" % (self.rflags, temp_file, repo.name, self.settings.webdir+"/repo_mirror")

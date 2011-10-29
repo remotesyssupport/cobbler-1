@@ -39,6 +39,7 @@ FIELDS = [
   ["mirror",None,0,"Mirror",True,"Address of yum or rsync repo to mirror",0,"str"],
   ["mtime",0,0,"",False,"",0,"float"],
   ["name","",0,"Name",True,"Ex: f10-i386-updates",0,"str"],
+  ["remote_name","",0,"Remote Repo Name",True,"Ex: f10-i386-updates",0,"str"],
   ["owners","SETTINGS:default_ownership",0,"Owners",True,"Owners list for authz_ownership (space delimited)",[],"list"],
   ["parent",None,0,"",False,"",0,"str"],
   ["rpm_list",[],0,"RPM List",True,"Mirror just these RPMs (yum only)",0,"list"],
@@ -181,6 +182,9 @@ class Repo(item.Item):
     def set_mirror_locally(self,value):
         self.mirror_locally = utils.input_boolean(value)
         return True
+
+    def set_remote_name(self,value):
+        return utils.set_repo_remote_name(self,value)
 
     def get_parent(self):
         """
