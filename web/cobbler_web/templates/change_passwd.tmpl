@@ -1,0 +1,22 @@
+{% extends 'master.tmpl' %}
+{% block content %}
+
+<h1>Changing Password</h1>
+<hr />
+<form id="passwdform" method="post" action="/cobbler_web/do_change_passwd">
+  {% csrf_token %}
+  <ol class="sectionbody" id="block_password">
+    <li class="editrow">
+      <label for="password">Password:</label>
+      <input type="password" name="password" id="password" />
+    </li>
+    <li class="editrow">
+      <label for="password_confirm">Confirm:</label>
+      <input type="password" name="password_confirm" id="password_confirm" />
+    </li>
+    <li>
+      <input class="button" type="submit" name="submit" value="Save" />
+    </li>
+  </ol>
+</form>
+{% endblock content %}

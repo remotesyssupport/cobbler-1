@@ -25,6 +25,7 @@ import distutils.sysconfig
 import ConfigParser
 import sys
 import os
+import string
 from utils import _
 from utils import md5
 import traceback
@@ -60,6 +61,14 @@ def __parse_storage():
             pass
     return results
 
+def __save_userlist(userlist):
+    fd = open("/etc/cobbler/users.digest","w")
+    for user in userlist:
+        line = string.join(user,":")
+        fd.write(line + "\n")
+    fd.close()
+    return True
+
 def authenticate(api_handle,username,password):
     """
     Validate a username/password combo, returning True/False
@@ -81,4 +90,21 @@ def authenticate(api_handle,username,password):
 
     return False
 
+def change_password(api_handle,username,password):
+    """
+    Update the password in the users.digest file
+    """
 
+    # FIXME: is this thread-safe? Should we do
+    # some kind of locking here so two people saving
+    # passwords at the same time doesn't mess things up?
+
+    userlist = __parse_storage()
+    for i in range(0,len(userlist)):
+        (user,realm,actual_blob) = userlist[i]
+        if user == username and realm == "Cobbler":
+            input = ":".join([user,realm,password])
+            userlist[i][2] = md5(input).hexdigest().lower()
+            return __save_userlist(userlist)
+
+    return False

@@ -1758,6 +1758,13 @@ class CobblerXMLRPCInterface:
             return True
         return False    
 
+    def change_password(self,username,password):
+        """
+        Attempts to change the password via the modules 
+        change_password() method
+        """
+        return self.api.change_password(username,password)
+
     def token_check(self,token):
         """
         Checks to make sure a token is valid or not

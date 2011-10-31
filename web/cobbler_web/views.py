@@ -1209,3 +1209,23 @@ def do_logout(request):
     request.session['username'] = ""
     request.session['token'] = ""
     return HttpResponseRedirect("/cobbler_web")
+
+@csrf_protect
+def change_passwd(request):
+    if not test_user_authenticated(request): return login(request, next="/cobbler_web/change_passwd")
+    return render_to_response('change_passwd.tmpl', RequestContext(request,{}))
+
+@csrf_protect
+def do_change_passwd(request):
+    global remote
+    
+    if not test_user_authenticated(request): return login(request, next="/cobbler_web/change_passwd")
+
+    password = request.POST.get('password', '')
+    if password != '':
+        if remote.change_password(request.session['username'],password):
+            return render_to_response('message.tmpl',RequestContext(request,{'message':'Password changed successfully.'}))
+        else:
+            return render_to_response('error_page.tmpl',RequestContext(request,{'message':'There was an error while attempting to change your password.'}))
+    else:
+        return render_to_response('error_page.tmpl',RequestContext(request,{'message':'Invalid password specified.'}))

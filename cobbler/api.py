@@ -934,6 +934,24 @@ class BootAPI:
         self.log("authorize",[user,resource,arg1,arg2,rc],debug=True)
         return rc
 
+    def change_password(self,user,password):
+        """
+        (Remote) access control.
+        Cobbler internal use only.
+        """
+
+        # We wrap this in a try block because some authn
+        # modules may not implement the change_password method.
+        # This just ensures we handle errors if all modules 
+        # haven't been updated to support this feature.
+
+        try:
+            rc = self.authn.change_password(self,user,password)
+            self.log("changing password",[user,rc])
+            return rc
+        except:
+            return False
+
     # ==========================================================================
 
     def build_iso(self,iso=None,profiles=None,systems=None,buildisodir=None,distro=None,standalone=None,source=None, exclude_dns=None, logger=None):

@@ -47,4 +47,6 @@ urlpatterns = patterns('',
     (r'^login$', login),
     (r'^do_login$', do_login),
     (r'^logout$', do_logout),
+    (r'^change_passwd$', change_passwd),
+    (r'^do_change_passwd$', do_change_passwd),
 )
